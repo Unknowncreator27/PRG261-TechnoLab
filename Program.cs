@@ -117,7 +117,7 @@ namespace PRG261_TechnoLab
                 print($"Booking #{count}: \n");
                 print($"Student name: {book.StudentfName} {book.StudentlName}\n");
                 print($"Student Number: {book.studentNumber}\n");
-                print($"Booking Duration: {book.bookingDuration}\n");
+                print($"Booking Duration: {book.bookingDuration} hours\n");
                 print($"Contact Number: {book.ContactNumber}\n\n");
                 count++;
 
@@ -169,7 +169,7 @@ namespace PRG261_TechnoLab
                 // Call confirmBooking()
                 print($"Lastest booking:\nStudent: {booking.StudentfName} {booking.StudentlName}\n" +
                     $"Student Number: {booking.studentNumber}\n" +
-                    $"Duration: {booking.bookingDuration}\n" +
+                    $"Duration: {booking.bookingDuration} hours\n" +
                     $"Contact: {booking.ContactNumber}\n" +
                     $"Equipment to use: {booking.equipType}\n\n" +
                     $"Has training: {booking.hasCompletedRequiredTraining}\n\n");
@@ -255,6 +255,66 @@ namespace PRG261_TechnoLab
 
         }
 
+        //3. 
+        public static void DisplayBookingStats(List<Booking> allBookings)
+        {
+            if (allBookings == null || allBookings.Count == 0)
+            {
+                print("No bookings to display stats for.\n\n");
+                return;
+            }
+
+            int totalRequests = allBookings.Count;
+            int approvedCount = ApprovedBookings.Count;
+            int rejectedCount = RejectedBookings.Count;
+
+            print("\n=== BOOKING STATISTICS ===\n\n");
+            print($"Total booking requests   : {totalRequests}\n");
+            print($"Approved bookings        : {approvedCount}\n");
+            print($"Rejected bookings        : {rejectedCount}\n\n");
+            print($"Pending management Review: {ApprovedBookings.Count(b => false)}\n\n"); // mark conditional bookings
+            if (ApprovedBookings.Count == 0)
+            {
+                print("No approved bookings to show.\n\n");
+                return;
+            }
+
+            var sortedApproved = ApprovedBookings.OrderBy(b => b.YearOfStudy)
+                .ThenBy(b => GetActiveBookingCount(b, allBookings))
+                .ThenBy(b => b.bookingDuration)
+                .ToList();
+
+            print("=== APPROVED BOOKINS (In priorty order) ===\n\n");
+            int rank = 1;
+            foreach (var booking in sortedApproved)
+            {
+                int activeCount = GetActiveBookingCount(booking, allBookings);
+                string priorityNote = "";
+                if(booking.bookingDuration > 5)
+                {
+                    priorityNote = " (Conditional - Management Review Required)";
+                    
+                }
+
+                print($"Priority #{rank} :\n");
+                print($"Student     : {booking.StudentfName} {booking.StudentlName}\n");
+                print($"Student No  : {booking.studentNumber}\n");
+                print($"Year of Study : {booking.YearOfStudy}\n");
+                print($"Duration    : {booking.bookingDuration} hours{priorityNote}\n");
+                print($"Active bookings : {activeCount}\n");
+                print($"Equipment   : {booking.equipType}\n");
+                print($"Training    : {(booking.hasCompletedRequiredTraining ? "Completed" : "Not Completed")}\n");
+                print(new string('-', 50) + "\n");
+                rank++;
+            }
+        }
+
+        // Helper method to calculate active bookings for a student
+        private static int GetActiveBookingCount(Booking booking, List<Booking> allBookings)
+        {
+            return allBookings.Count(b => b.studentNumber == booking.studentNumber);
+        }
+
 
 
         enum MenuOptions
@@ -287,7 +347,7 @@ namespace PRG261_TechnoLab
                 switch (optionChosen)
                 {
                     case 1:
-                        // TODO: Implement this
+                        
                         print($"You chose {Enum.GetNames(typeof(MenuOptions)).GetValue(optionChosen - 1)}\n\n");
                         Thread.Sleep(5);
                         while (continueBooking)
@@ -313,10 +373,11 @@ namespace PRG261_TechnoLab
                         break;
                     case 3:
                         print($"You chose {Enum.GetNames(typeof(MenuOptions)).GetValue(optionChosen - 1)}\n\n");
-                        // TODO: Implement
+                        DisplayBookingStats(bookings);
+                        isRunnng = true;
                         break;
                     case 4:
-                        print("\n Call again soon.");
+                        print("\n Call again soon.\n\n");
                         Environment.Exit(0);
                         break;
                     case 5:
