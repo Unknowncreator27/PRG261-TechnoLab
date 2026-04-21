@@ -326,6 +326,40 @@ namespace PRG261_TechnoLab
             Exit
 
         }
+
+        public static void DisplayMenu()
+        {
+            string borderTop = "";
+            print("Hi there user. Welcome to our TechnoLab. How can we assist you today?\n");
+            for (int i = 0; i < 10; i++)
+            {
+                i = borderTop.Length;
+                i++;
+                borderTop += "=";
+                print(borderTop);
+               
+
+            }
+            print("\n");
+            foreach (var option in Enum.GetValues(typeof(MenuOptions)))
+            {
+                
+                print($"{(int)option} - {option.ToString()}\n");
+            }
+            string borderBottom = "";
+
+            for (int i = 0; i < 10; i++)
+            {
+                i = borderBottom.Length;
+                i++;
+                borderBottom += "=";
+                print(borderBottom);
+
+
+            }
+            print("\n");
+
+        }
         static void Main(string[] args)
         {
           List<Booking> bookings = new List<Booking>();
@@ -333,13 +367,7 @@ namespace PRG261_TechnoLab
           bool continueBooking = true;
 
             while (isRunnng) {
-                print("Hi there user. Welcome to our TechnoLab. How can we assist you today?\n");
-
-                foreach (var option in Enum.GetValues(typeof(MenuOptions)))
-                {
-                    print($"{(int)option} - {option.ToString()}\n");
-
-                }
+                DisplayMenu();
 
                 print("Enter an option: \n");
                 int optionChosen = int.Parse(Console.ReadLine());
