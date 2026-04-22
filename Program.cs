@@ -7,6 +7,13 @@ using System.Threading.Tasks;
 
 namespace PRG261_TechnoLab
 {
+
+    /// <summary>
+    /// Contributors
+    /// Hanro Lombard (603200) - Did most to all of the code
+    /// Thabo Hammer - Made small changes to the code
+    /// Tarah Barwe - Made small changes to the code
+    /// </summary>
     public class Booking
     {
         public string StudentfName;
