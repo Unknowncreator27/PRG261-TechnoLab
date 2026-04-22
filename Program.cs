@@ -371,6 +371,7 @@ namespace PRG261_TechnoLab
 
                 print("Enter an option: \n");
                 int optionChosen = int.Parse(Console.ReadLine());
+               
 
                 
                 switch (optionChosen)
@@ -408,15 +409,18 @@ namespace PRG261_TechnoLab
                     case 4:
                         print("\n Call again soon.\n\n");
                         Environment.Exit(0);
+                        isRunnng = false;
                         break;
                     case 5:
                         print("\n=== SECRET METHOD CALLED ===\n\n");
                         VerifyBooking(bookings);
                         print("=== END OF SECRET METHOD ===\n\n");
+                        isRunnng = true;
 
                         break;
                     default:
                         print("Invalid option, choose from the list below:");
+                        isRunnng = true;
                         break;
                 }
 
