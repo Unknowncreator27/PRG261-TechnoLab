@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PRG261_TechnoLab
 {
-    public class Write
+    public class Write: IWriter
     {
 
         public void print(string input)

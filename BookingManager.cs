@@ -12,45 +12,22 @@ namespace PRG261_TechnoLab
     internal class BookingManager
     {
         // These lists store the results of the evaluation process
-        public static List<Booking> ApprovedBookings = new List<Booking>();
-        public static List<Booking> RejectedBookings = new List<Booking>();
-        public static Write write = new Write();
-        public  Booking FormatAndValidateBooking(Booking bookingData)
+        public static List<Booking> ApprovedBookings { get; private set; } = new List<Booking>();
+        public static List<Booking> RejectedBookings { get; private set; } = new List<Booking>();
+        private Write write = new Write();
+        private BookingValidator validator = new BookingValidator();
+
+
+        public BookingManager()
         {
 
-            // 1. Trim and normalize strings
-            bookingData.StudentfName = (bookingData.StudentfName ?? "").Trim();
-            bookingData.StudentlName = (bookingData.StudentlName ?? "").Trim();
-            bookingData.ContactNumber = (bookingData.ContactNumber ?? "").Trim();
-
-            // 2. Capitalize student names
-            if (!string.IsNullOrEmpty(bookingData.StudentfName))
-                bookingData.StudentfName = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(bookingData.StudentfName.ToLower());
-            if (!string.IsNullOrEmpty(bookingData.StudentlName))
-                bookingData.StudentlName = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(bookingData.StudentlName.ToLower());
-
-            // 3. Validate student number (must be 6 digits)
-            string studentNumberStr = bookingData.studentNumber.ToString();
-            if (studentNumberStr.Length != 6)
-            {
-                throw new ArgumentException("Invalid student number. Must be 6 digits.");
-            }
-
-            // 4. Validate contact number (at least 10 digits)
-            if (bookingData.ContactNumber.Length < 10)
-            {
-                throw new ArgumentException("Invalid phone number. Must be at least 10 digits.");
-            }
-
-            // 5. Training validation
-            if (!bookingData.hasCompletedRequiredTraining)
-            {
-                throw new ArgumentException("Student has not completed the required training.");
-            }
-
-            return bookingData;
         }
 
+        public BookingManager(Write writer, BookingValidator Bookvalidator)
+        {
+            this.write = writer;
+            this.validator = Bookvalidator;
+        }
         public void VerifyBooking(List<Booking> bookings)
         {
             
@@ -106,7 +83,7 @@ namespace PRG261_TechnoLab
                 // Rejection happens in the Evaluate phase.
                 try
                 {
-                    booking = FormatAndValidateBooking(booking);
+                    booking = validator.FormatAndValidateBooking(booking);
                     write.print("Data validated successfully.\n");
                 }
                 catch (ArgumentException ex)
