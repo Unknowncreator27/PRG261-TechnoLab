@@ -38,14 +38,14 @@ namespace PRG261_TechnoLab
             if (bookingData.ContactNumber.Length < 10)
             {
                 write.print("Invalid phone number. Must be at least 10 digits.");
-                //throw new ArgumentException("Invalid phone number. Must be at least 10 digits.");
+                throw new ArgumentException("Invalid phone number. Must be at least 10 digits.");
             }
 
             // 5. Training validation
             if (!bookingData.hasCompletedRequiredTraining)
             {
                 write.print("Student has not completed the required training.");
-                //throw new ArgumentException("Student has not completed the required training.");
+                throw new ArgumentException("Student has not completed the required training.");
             }
 
             return bookingData;

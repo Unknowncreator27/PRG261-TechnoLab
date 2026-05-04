@@ -20,6 +20,7 @@ namespace PRG261_TechnoLab
     /// ==== MILESTONE 2 ====
     /// Contributions
     ///  - Hanro Lombard (603200)
+    ///  - [No other contributions]
     /// </summary>
 
     internal class Program
