@@ -10,9 +10,16 @@ namespace PRG261_TechnoLab
 
     /// <summary>
     /// Contributors
-    /// Hanro Lombard (603200) - Did most to all of the code
-    /// Thabo Hammer (603918)- Made small changes to the code
-    /// Tarah Barwe () - Made small changes to the code
+    ///  - Hanro Lombard (603200) - Did most to all of the code
+    ///  - Thabo Hammer (603918) - Made small changes to the code
+    ///  - Tarah Barwe () - Made small changes to the code
+    /// </summary>
+    /// 
+
+    /// <summary>
+    /// ==== MILESTONE 2 ====
+    /// Contributions
+    ///  - Hanro Lombard (603200)
     /// </summary>
 
     internal class Program

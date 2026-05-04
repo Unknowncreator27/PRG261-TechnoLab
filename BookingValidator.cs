@@ -31,7 +31,7 @@ namespace PRG261_TechnoLab
             if (studentNumberStr.Length != 6)
             {
                 write.print("Invalid student number. Must be 6 digits.");
-                //throw new ArgumentException("Invalid student number. Must be 6 digits.");
+                
             }
 
             // 4. Validate contact number (at least 10 digits)

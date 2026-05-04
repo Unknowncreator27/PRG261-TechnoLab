@@ -175,7 +175,7 @@ namespace PRG261_TechnoLab
                     status = "CONDITIONALLY APPROVED (Management Review Required)";
                     conditionallyApprovedCount++;
                     ApprovedBookings.Add(booking);
-                    // FIRE APPROVED EVENT
+                    
                     OnBookingApproved?.Invoke(booking);
                 }
                 else
@@ -183,7 +183,7 @@ namespace PRG261_TechnoLab
                     status = "FULLY APPROVED";
                     approvedCount++;
                     ApprovedBookings.Add(booking);
-                    // FIRE APPROVED EVENT
+                    
                     OnBookingApproved?.Invoke(booking);
                 }
 
@@ -202,7 +202,7 @@ namespace PRG261_TechnoLab
         {
             write.print("\n=== CURRENT STATISTICS ===\n");
 
-            // LINQ: Count approved and rejected bookings
+            
             int approvedCount = ApprovedBookings.Count();
             int rejectedCount = RejectedBookings.Count();
             write.print($"Approved bookings: {approvedCount}\n");
@@ -214,11 +214,11 @@ namespace PRG261_TechnoLab
                 return;
             }
 
-            // LINQ: Filter only fully approved bookings (duration <= 4)
+            
             var fullyApproved = ApprovedBookings.Where(b => b.bookingDuration <= 4).ToList();
             write.print($"Fully Approved (no conditions): {fullyApproved.Count}\n\n");
 
-            // LINQ + DELEGATE: Sort bookings by priority score using the delegate
+            
             var sortedApproved = ApprovedBookings
                 .OrderByDescending(b => _priorityCalculator(b))
                 .ToList();
