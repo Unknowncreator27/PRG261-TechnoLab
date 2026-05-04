@@ -24,7 +24,7 @@ namespace PRG261_TechnoLab
 
     internal class Program
     {
-        // Problem solved: All of the BookigManager methods were static,
+        // Problem solved: All of the BookingManager methods were static,
         // causing it to error out when calling manager (instantiated)
         public static BookingManager manager = new BookingManager();
         public static Write write = new Write();
@@ -45,7 +45,8 @@ namespace PRG261_TechnoLab
             write.print(new string('=', 40) + "\n");
             foreach (var option in Enum.GetValues(typeof(MenuOptions)))
             {
-                write.print($"{(int)option} - {option.ToString()}\n");
+                // used ToString() - ambiguous
+                write.print($"[{(int)option}] - {option}\n");
             }
             write.print(new string('=', 40) + "\n");
         }
