@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 namespace PRG261_TechnoLab
 {
 
+    // DELEGATE: Defines the signature for booking priority calculation logic
+    public delegate int PriorityCalculator(Booking booking);
+
     internal class BookingManager
     {
         // These lists store the results of the evaluation process
@@ -17,20 +20,43 @@ namespace PRG261_TechnoLab
         private Write write = new Write();
         private BookingValidator validator = new BookingValidator();
 
+        // EVENT: Fired when a booking is approved
+        public event Action<Booking> OnBookingApproved;
+
+        // EVENT: Fired when a booking is rejected
+        public event Action<Booking, string> OnBookingRejected;
+
+        // DELEGATE INSTANCE: Used to calculate booking priority score
+        private PriorityCalculator _priorityCalculator;
 
         public BookingManager()
         {
+         
+            _priorityCalculator = CalculatePriority;
 
+            // Wire up default event handlers
+            OnBookingApproved += (booking) =>
+                write.print($"[EVENT] Booking APPROVED for {booking.Student.FullName}\n");
+
+            OnBookingRejected += (booking, reason) =>
+                write.print($"[EVENT] Booking REJECTED for {booking.Student.FullName} — Reason: {reason}\n");
         }
 
-        public BookingManager(Write writer, BookingValidator Bookvalidator)
+        public BookingManager(Write writer, BookingValidator bookvalidator)
         {
             this.write = writer;
-            this.validator = Bookvalidator;
+            this.validator = bookvalidator;
+            _priorityCalculator = CalculatePriority;
         }
+
+        
+        private int CalculatePriority(Booking booking)
+        {
+            return (booking.YearOfStudy * 10) - booking.bookingDuration;
+        }
+
         public void VerifyBooking(List<Booking> bookings)
         {
-            
             if (bookings == null || bookings.Count == 0)
             {
                 write.print("No bookings found in the system.\n\n");
@@ -62,7 +88,7 @@ namespace PRG261_TechnoLab
                 if (!int.TryParse(Console.ReadLine(), out int YOS)) throw new ArgumentException("Invalid year of study format.");
 
                 write.print("Capturing details...\n");
-                Thread.Sleep(500); // 0.5 seconds for UX
+                Thread.Sleep(500);
 
                 write.print("Booking Duration (hours): ");
                 if (!int.TryParse(Console.ReadLine(), out int bookingDuration)) throw new ArgumentException("Invalid duration format.");
@@ -79,8 +105,6 @@ namespace PRG261_TechnoLab
 
                 Booking booking = new Booking(name, bookingDuration, studentNum, cNum, lname, YOS, equipType, hasCompletedRequiredTraining);
 
-                // We validate here to ensure data is clean, but we don't reject yet.
-                // Rejection happens in the Evaluate phase.
                 try
                 {
                     booking = validator.FormatAndValidateBooking(booking);
@@ -143,18 +167,24 @@ namespace PRG261_TechnoLab
                     status = $"REJECTED ({reason})";
                     rejectedCount++;
                     RejectedBookings.Add(booking);
+                    // FIRE REJECTED EVENT
+                    OnBookingRejected?.Invoke(booking, reason);
                 }
                 else if (booking.bookingDuration > 4)
                 {
                     status = "CONDITIONALLY APPROVED (Management Review Required)";
                     conditionallyApprovedCount++;
                     ApprovedBookings.Add(booking);
+                    // FIRE APPROVED EVENT
+                    OnBookingApproved?.Invoke(booking);
                 }
                 else
                 {
                     status = "FULLY APPROVED";
                     approvedCount++;
                     ApprovedBookings.Add(booking);
+                    // FIRE APPROVED EVENT
+                    OnBookingApproved?.Invoke(booking);
                 }
 
                 write.print($"Student: {booking.StudentfName} {booking.StudentlName} ({booking.studentNumber})\n");
@@ -171,32 +201,39 @@ namespace PRG261_TechnoLab
         public void DisplayBookingStats()
         {
             write.print("\n=== CURRENT STATISTICS ===\n");
-            write.print($"Approved bookings: {ApprovedBookings.Count}\n");
-            write.print($"Rejected bookings: {RejectedBookings.Count}\n\n");
 
-            if (ApprovedBookings.Count == 0)
+            // LINQ: Count approved and rejected bookings
+            int approvedCount = ApprovedBookings.Count();
+            int rejectedCount = RejectedBookings.Count();
+            write.print($"Approved bookings: {approvedCount}\n");
+            write.print($"Rejected bookings: {rejectedCount}\n\n");
+
+            if (approvedCount == 0)
             {
                 write.print("No approved bookings to display.\n\n");
                 return;
             }
 
-            var sortedApproved = ApprovedBookings.OrderBy(b => b.YearOfStudy)
-                .ThenBy(b => b.bookingDuration)
+            // LINQ: Filter only fully approved bookings (duration <= 4)
+            var fullyApproved = ApprovedBookings.Where(b => b.bookingDuration <= 4).ToList();
+            write.print($"Fully Approved (no conditions): {fullyApproved.Count}\n\n");
+
+            // LINQ + DELEGATE: Sort bookings by priority score using the delegate
+            var sortedApproved = ApprovedBookings
+                .OrderByDescending(b => _priorityCalculator(b))
                 .ToList();
-            var sortedRejected = ApprovedBookings.OrderBy(b => b.YearOfStudy).ThenBy(b => b.bookingDuration).ToList();
 
             write.print("=== APPROVED BOOKINGS (By Priority) ===\n\n");
             int rank = 1;
             foreach (var booking in sortedApproved)
             {
                 string note = booking.bookingDuration > 4 ? " [CONDITIONAL]" : "";
-                write.print($"{rank}. {booking.StudentfName} {booking.StudentlName} (Year {booking.YearOfStudy}){note}\n");
+                int score = _priorityCalculator(booking);
+                write.print($"{rank}. {booking.StudentfName} {booking.StudentlName} (Year {booking.YearOfStudy}) — Priority Score: {score}{note}\n");
                 write.print($"   {booking.equipType} for {booking.bookingDuration}h\n");
                 rank++;
             }
             write.print("\n");
-
-
         }
 
         public void AddPredefinedBookings(List<Booking> bookings)
@@ -216,13 +253,9 @@ namespace PRG261_TechnoLab
             };
 
             foreach (var b in predefined)
-            {
                 bookings.Add(b);
-            }
+
             write.print("Predefined bookings added to the system queue.\n");
-
         }
-
-
     }
 }

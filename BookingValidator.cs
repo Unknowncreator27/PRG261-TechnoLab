@@ -2,15 +2,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace PRG261_TechnoLab
 {
-    internal class BookingValidator: IBookingValidator
+    internal class BookingValidator : IBookingValidator
     {
+
         public Booking FormatAndValidateBooking(Booking bookingData)
         {
+            Write write = new Write();
 
             // 1. Trim and normalize strings
             bookingData.StudentfName = (bookingData.StudentfName ?? "").Trim();
@@ -27,19 +30,22 @@ namespace PRG261_TechnoLab
             string studentNumberStr = bookingData.studentNumber.ToString();
             if (studentNumberStr.Length != 6)
             {
-                throw new ArgumentException("Invalid student number. Must be 6 digits.");
+                write.print("Invalid student number. Must be 6 digits.");
+                //throw new ArgumentException("Invalid student number. Must be 6 digits.");
             }
 
             // 4. Validate contact number (at least 10 digits)
             if (bookingData.ContactNumber.Length < 10)
             {
-                throw new ArgumentException("Invalid phone number. Must be at least 10 digits.");
+                write.print("Invalid phone number. Must be at least 10 digits.");
+                //throw new ArgumentException("Invalid phone number. Must be at least 10 digits.");
             }
 
             // 5. Training validation
             if (!bookingData.hasCompletedRequiredTraining)
             {
-                throw new ArgumentException("Student has not completed the required training.");
+                write.print("Student has not completed the required training.");
+                //throw new ArgumentException("Student has not completed the required training.");
             }
 
             return bookingData;

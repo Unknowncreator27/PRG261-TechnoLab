@@ -14,15 +14,15 @@ namespace PRG261_TechnoLab
     /// Thabo Hammer (603918)- Made small changes to the code
     /// Tarah Barwe () - Made small changes to the code
     /// </summary>
-    
+
     internal class Program
     {
-        // Problem solved: All of the BOokigManager methods were static,
+        // Problem solved: All of the BookigManager methods were static,
         // causing it to error out when calling manager (instantiated)
         public static BookingManager manager = new BookingManager();
         public static Write write = new Write();
-       
-        
+
+
         enum MenuOptions
         {
             CaptureBookingRequests = 1,
@@ -43,15 +43,21 @@ namespace PRG261_TechnoLab
             write.print(new string('=', 40) + "\n");
         }
 
-        
+
 
         static void Main(string[] args)
         {
             List<Booking> bookings = new List<Booking>();
-            
-            // Pass the list to AddPredefinedBookings so they are captured
-            manager.AddPredefinedBookings(bookings);
 
+            try
+            {
+                // Pass the list to AddPredefinedBookings so they are captured
+                manager.AddPredefinedBookings(bookings);
+
+            } catch(Exception e)
+            {
+                write.print($"Error loading predefined bookings {e}");
+            }
             while (true)
             {
                 DisplayMenu();
@@ -62,33 +68,48 @@ namespace PRG261_TechnoLab
                     continue;
                 }
 
-                switch (choice)
+                try
                 {
-                    case 1:
-                        bool more = true;
-                        while (more)
-                        {
-                            bookings = manager.CaptureBookingRequests(bookings);
-                            write.print("Add another (y/n)? ");
-                            string res = Console.ReadLine().ToLower();
-                            if (string.IsNullOrEmpty(res) || res[0] == 'n') more = false;
-                        }
-                        break;
-                    case 2:
-                        manager.EvaluateBookingElgibility(bookings);
-                        break;
-                    case 3:
-                        manager.DisplayBookingStats();
-                        break;
-                    case 4:
-                        write.print("\nGoodbye!\n");
-                        return;
-                    case 5:
-                        manager.VerifyBooking(bookings);
-                        break;
-                    default:
-                        write.print("Invalid option. Please choose an option from the list below\n");
-                        break;
+                    switch (choice)
+                    {
+                        case 1:
+                            bool more = true;
+                            while (more)
+                            {
+                                bookings = manager.CaptureBookingRequests(bookings);
+                                write.print("Add another (y/n)? ");
+                                string res = Console.ReadLine().ToLower();
+                                if (string.IsNullOrEmpty(res) || res[0] == 'n') more = false;
+                            }
+                            break;
+                        case 2:
+                            manager.EvaluateBookingElgibility(bookings);
+                            break;
+                        case 3:
+                            manager.DisplayBookingStats();
+                            break;
+                        case 4:
+                            write.print("\nGoodbye!\n");
+                            return;
+                        case 5:
+                            manager.VerifyBooking(bookings);
+                            break;
+
+                        case 6:
+                            // Clear the console for spacing / clarity
+                            Console.Clear();
+                            write.print("Console cleared!");
+                            break;
+                        default:
+                            write.print("Invalid option. Please choose an option from the list below\n");
+                            break;
+                    }
+                } catch(InvalidOperationException ioe)
+                {
+                    write.print($"Exception Occurred: {ioe.Message}");
+                } catch(Exception e)
+                {
+                    write.print($"Unexpected error: {e}");
                 }
             }
         }
